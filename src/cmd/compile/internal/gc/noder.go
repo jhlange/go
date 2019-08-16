@@ -1524,6 +1524,8 @@ func (p *noder) pragma(pos syntax.Pos, text string) syntax.Pragma {
 		}
 		p.pragcgo(pos, text)
 		fallthrough // because of //go:cgo_unsafe_args
+	case strings.HasPrefix(text, "go:asm "):
+
 	default:
 		verb := text
 		if i := strings.Index(text, " "); i >= 0 {

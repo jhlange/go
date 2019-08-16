@@ -929,8 +929,13 @@ func (t *Type) ArgWidth() int64 {
 
 func (t *Type) Size() int64 {
 	if t.Etype == TSSA {
-		if t == TypeInt128 {
+		switch t {
+		case t == TypeInt128:
 			return 16
+		case t == TypeInt256:
+			return 32
+		case t == TypeInt512:
+			return 64
 		}
 		return 0
 	}
@@ -1525,4 +1530,6 @@ var (
 	TypeFlags   = newSSA("flags")
 	TypeVoid    = newSSA("void")
 	TypeInt128  = newSSA("int128")
+	TypeInt256  = newSSA("int256")
+	TypeInt512  = newSSA("int512")
 )

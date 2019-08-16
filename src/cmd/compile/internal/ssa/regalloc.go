@@ -793,6 +793,8 @@ func (s *regAllocState) compatRegs(t *types.Type) regMask {
 	}
 	if t.IsFloat() || t == types.TypeInt128 {
 		m = s.f.Config.fpRegMask
+	} else if t == types.TypeInt256 || t == types.TypeInt512 {
+		m = s.f.Config.avx512FRegMask
 	} else {
 		m = s.f.Config.gpRegMask
 	}

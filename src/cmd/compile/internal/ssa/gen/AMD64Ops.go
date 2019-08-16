@@ -46,6 +46,7 @@ var regNamesAMD64 = []string{
 	"R13",
 	"R14",
 	"R15",
+	// SSE registers
 	"X0",
 	"X1",
 	"X2",
@@ -62,6 +63,23 @@ var regNamesAMD64 = []string{
 	"X13",
 	"X14",
 	"X15",
+	// AVX-512 registers
+	"Z16",
+	"Z17",
+	"Z18",
+	"Z19",
+	"Z20",
+	"Z21",
+	"Z22",
+	"Z23",
+	"Z24",
+	"Z25",
+	"Z26",
+	"Z27",
+	"Z28",
+	"Z29",
+	"Z30",
+	"Z31",
 
 	// pseudo-registers
 	"SB",
@@ -89,17 +107,38 @@ func init() {
 	}
 
 	// Common individual register masks
+	//
+	// A note on the x/y/z 16-31 registers.
+	//
+	// AS of Summer 2019, only systems with latest AVX-512F standard supports x/y/z 0-31
+	//
+	// Earlier CPUs (like the ones most people have now), only support x/y in 0-15)
+	//
+	// For the sake of the register allocation algorithm, the larger rarely-to-be-used
+	// instrutions can be forced to be in that mutually exclusive space, away from the
+	// non-AVX-512F instructions. Once someone decides to drop pre-AVX-512 support, the
+	// code should be changed to allow fp and avx512F to all be used for most of the ops.
+	//
+	// if AVX512F is known to be on the target host by this point (force flags/jit/etc):
+	//       Use all of (SSE | AVX512F) for SSE and later instructions (and some of the normal math?).
+	// else:
+	//       Allow the AVX512F instructions on all registers, and scope AVX and SSE to
+	//       The SSE registers.
+	//
 	var (
-		ax         = buildReg("AX")
-		cx         = buildReg("CX")
-		dx         = buildReg("DX")
-		bx         = buildReg("BX")
-		si         = buildReg("SI")
-		gp         = buildReg("AX CX DX BX BP SI DI R8 R9 R10 R11 R12 R13 R14 R15")
-		fp         = buildReg("X0 X1 X2 X3 X4 X5 X6 X7 X8 X9 X10 X11 X12 X13 X14 X15")
+		ax = buildReg("AX")
+		cx = buildReg("CX")
+		dx = buildReg("DX")
+		bx = buildReg("BX")
+		si = buildReg("SI")
+		gp = buildReg("AX CX DX BX BP SI DI R8 R9 R10 R11 R12 R13 R14 R15")
+		// CPUID: SSE and up
+		fp = buildReg("X0 X1 X2 X3 X4 X5 X6 X7 X8 X9 X10 X11 X12 X13 X14 X15")
+		// CPUID: AVX512F and up (Not AVX*!)
+		avx512F    = buildReg("Z16 Z17 Z18 Z19 Z20 Z21 Z22 Z23 Z24 Z25 Z26 Z27 Z28 Z29 Z30 Z31")
 		gpsp       = gp | buildReg("SP")
 		gpspsb     = gpsp | buildReg("SB")
-		callerSave = gp | fp
+		callerSave = gp | fp | avx512F
 	)
 	// Common slices of register masks
 	var (

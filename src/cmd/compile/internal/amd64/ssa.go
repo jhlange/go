@@ -72,6 +72,15 @@ func storeByType(t *types.Type) obj.As {
 			return x86.AMOVL
 		case 8:
 			return x86.AMOVQ
+		case 16:
+			// int128s are available with cpuid: SSE
+			return x86.AMOVUPS
+		case 32:
+			// int256s are available with cpuid: AVX
+			return x86.AVMOVAPS
+		case 64:
+			// int512s are available with cpuid: AVX512F
+			return x86.AVMOVUPS
 		}
 	}
 	panic("bad store type")
@@ -97,7 +106,14 @@ func moveByType(t *types.Type) obj.As {
 		case 8:
 			return x86.AMOVQ
 		case 16:
-			return x86.AMOVUPS // int128s are in SSE registers
+			// int128s are available with cpuid: SSE
+			return x86.AMOVUPS
+		case 32:
+			// int256s are available with cpuid: AVX
+			return x86.AVMOVAPS
+		case 64:
+			// int512s are available with cpuid: AVX512F
+			return x86.AVMOVUPS
 		default:
 			panic(fmt.Sprintf("bad int register width %d:%s", t.Size(), t))
 		}

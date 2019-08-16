@@ -3683,6 +3683,7 @@ func findIntrinsic(sym *types.Sym) intrinsicBuilder {
 	}
 
 	fn := sym.Name
+
 	if ssa.IntrinsicsDisable {
 		if pkg == "runtime" && (fn == "getcallerpc" || fn == "getcallersp" || fn == "getclosureptr") {
 			// These runtime functions don't have definitions, must be intrinsics.
@@ -3690,6 +3691,7 @@ func findIntrinsic(sym *types.Sym) intrinsicBuilder {
 			return nil
 		}
 	}
+
 	return intrinsics[intrinsicKey{thearch.LinkArch.Arch, pkg, fn}]
 }
 
